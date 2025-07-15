@@ -3,6 +3,14 @@ image:
 
 tasks:
   - init: |
+      curl -s "https://get.sdkman.io" | bash
+      source "$HOME/.sdkman/bin/sdkman-init.sh"
+      sdk install java 17.0.9-tem
+      sdk use java 17.0.9-tem
+  - command: |
+      ./gradlew clean build
+      ./gradlew :io.openems.edge.application:run
+  - init: |
       touch /tmp/.gradle-lock
       ./gradlew build buildBackend -x test
       rm /tmp/.gradle-lock
