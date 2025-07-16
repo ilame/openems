@@ -2,34 +2,40 @@ image:
   file: .gitpod.Dockerfile
 
 tasks:
-  - init: |
+  - name: Use Java 17 + build OpenEMS
+    init: |
       curl -s "https://get.sdkman.io" | bash
       source "$HOME/.sdkman/bin/sdkman-init.sh"
       sdk install java 17.0.9-tem
       sdk use java 17.0.9-tem
-  - command: |
-      ./gradlew clean build
-      ./gradlew :io.openems.edge.application:run
-  - init: |
+      java -version
       touch /tmp/.gradle-lock
       ./gradlew build buildBackend -x test
       rm /tmp/.gradle-lock
-    command: java 
-      -Dfelix.cm.dir=$(pwd)/tools/gitpod/openems-backend/config.d
-      -jar build/openems-backend.jar
-  - init: |
+    command: |
+      java \
+        -Dfelix.cm.dir=$(pwd)/tools/gitpod/openems-backend/config.d \
+        -jar build/openems-backend.jar
+
+  - name: Build and run OpenEMS Edge
+    init: |
       sleep 10 && while [ -f /tmp/.gradle-lock ]; do sleep 1; done
       ./gradlew build buildEdge -x test
-    command: java 
-      -Dfelix.cm.dir=$(pwd)/tools/gitpod/openems-edge/config.d
-      -Dopenems.data.dir=$(pwd)/tools/gitpod/openems-edge/data
-      -jar build/openems-edge.jar
-  - init: cd ui && npm install
-    command: ng serve 
-      -c openems-gitpod
-      --host 0.0.0.0
+    command: |
+      java \
+        -Dfelix.cm.dir=$(pwd)/tools/gitpod/openems-edge/config.d \
+        -Dopenems.data.dir=$(pwd)/tools/gitpod/openems-edge/data \
+        -jar build/openems-edge.jar
+
+  - name: Run OpenEMS UI
+    init: cd ui && npm install
+    command: ng serve \
+      -c openems-gitpod \
+      --host 0.0.0.0 \
       --disable-host-check
-  - init: |
+
+  - name: Setup Odoo + addons
+    init: |
       mkdir -p /workspace/odoo
       cd /workspace/odoo
       mkdir -p addons-available addons-enabled
@@ -47,7 +53,7 @@ ports:
   - name: OpenEMS UI
     description: OpenEMS User-Interface. Login admin:admin
     port: 4200
-    onOpen: open-browser 
+    onOpen: open-browser
   - name: OpenEMS Backend - Odoo. Login admin:admin
     description: Odoo - Open Source ERP und CRM
     port: 8069
@@ -72,11 +78,11 @@ ports:
     port: 5432
     onOpen: ignore
   - name: OpenEMS Backend - Edge-Websocket
-    description: OpenEMS Edges connect here 
+    description: OpenEMS Edges connect here
     port: 8081
     onOpen: ignore
   - name: OpenEMS Backend - UI-Websocket
-    description: OpenEMS UIs connect here 
+    description: OpenEMS UIs connect here
     port: 8082
     onOpen: ignore
   - name: OpenEMS Edge - JSON/REST Api
