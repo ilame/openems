@@ -14,10 +14,10 @@ RUN npm install -g @angular/cli
 # Install odoo
 ENV ODOO_VERSION 16.0
 ENV ODOO_RELEASE latest
-RUN curl -o odoo.deb -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/odoo_${ODOO_VERSION}.${ODOO_RELEASE}_all.deb \
-    && sudo apt-get update \
-    && sudo apt-get -y install --no-install-recommends ./odoo.deb \
-    && sudo rm -rf /var/lib/apt/lists/* odoo.deb
+#RUN curl -o odoo.deb -sSL http://nightly.odoo.com/${ODOO_VERSION}/nightly/deb/odoo_${ODOO_VERSION}.${ODOO_RELEASE}_all.deb \
+#   && sudo apt-get update \
+#   && sudo apt-get -y install --no-install-recommends ./odoo.deb \
+#   && sudo rm -rf /var/lib/apt/lists/* odoo.deb
 
 # Install wkhtmltopdf
 ENV WKHTMLTOPDF_VERSION 0.12.6.1-2
